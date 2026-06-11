@@ -6,7 +6,7 @@ source = ~/.config/hypr/colors.conf
 ################
 
 # See https://wiki.hypr.land/Configuring/Monitors/
-monitor=eDP-1,1920x1080@60,0x0,1.0
+monitor=eDP-1,1920x1080@60,0x0,1.00
 
 
 ###################
@@ -33,14 +33,13 @@ exec-once = kbuildsycoca6
 exec-once = waybar
 exec-once = bash -c "hyprpaper & sleep 2 && hyprctl hyprpaper wallpaper 'eDP-1,/usr/share/wallpapers/wallpaper/photo_11_2026-05-01_22-51-32.jpg'"
 exec-once = dunst
-exec-once = ~/.config/waybar/battery-notify.sh
 exec-once = /usr/lib/xdg-desktop-portal-kde
 exec-once = bash -c "sleep 2 && swayidle -w \
     timeout 150 'brightnessctl -s set 10' resume 'brightnessctl -r' \
     timeout 300 'pidof hyprlock || hyprlock' \
     timeout 360 'hyprctl dispatch dpms off' resume 'hyprctl dispatch dpms on' \
     before-sleep 'pidof hyprlock || hyprlock' \
-    after-resume 'hyprctl dispatch dpms on'"
+    after-resume 'hyprctl dispatch dpms on && sleep 1 && pidof hyprlock || hyprlock'"
 exec-once = sudo ~/windows.sh
 exec-once = copyq
 
@@ -118,12 +117,13 @@ decoration {
 animations {
     enabled = true
 
-    bezier = snap, 0.05, 0.7, 0.1, 1.0
+    bezier = snap,   0.05, 0.7, 0.1, 1.0
+    bezier = slide,  0.25, 1.0, 0.5, 1.0
 
     animation = windows,    1, 3, snap
     animation = border,     1, 5, snap
     animation = fade,       1, 3, snap
-    animation = workspaces, 1, 3, snap
+    animation = workspaces, 1, 5, slide, slide
 }
 
 # Ref https://wiki.hypr.land/Configuring/Workspace-Rules/
@@ -151,7 +151,7 @@ animations {
 
 # See https://wiki.hypr.land/Configuring/Dwindle-Layout/ for more
 dwindle {
-    # pseudotile = true # Master switch for pseudotiling. Enabling is bound to mainMod + P in the keybinds section below
+    pseudotile = true # Master switch for pseudotiling. Enabling is bound to mainMod + P in the keybinds section below
     preserve_split = true # You probably want this
 }
 
@@ -194,17 +194,13 @@ gesture = 3, horizontal, workspace
 gestures {
     workspace_swipe_distance    = 200
     workspace_swipe_cancel_ratio = 0.2
-    workspace_swipe_min_speed_to_force = 25
+    workspace_swipe_min_speed_to_force = 15
 }
 
 # Example per-device config
 # See https://wiki.hypr.land/Configuring/Keywords/#per-device-input-configs for more
 device {
-    name = epic-mouse-v1# Resize active window with mainMod + alt + arrow keys
-binde = $mainMod ALT, left,  resizeactive, -30 0
-binde = $mainMod ALT, right, resizeactive, 30 0
-binde = $mainMod ALT, up,    resizeactive, 0 -30
-binde = $mainMod ALT, down,  resizeactive, 0 30
+    name = epic-mouse-v1
     sensitivity = -0.5
 }
 
@@ -294,8 +290,8 @@ bind = $mainMod, Print, exec, mkdir -p ~/Pictures/Screenshots && grim ~/Pictures
 # Laptop multimedia keys for volume and LCD brightness
 bindel = ,XF86AudioRaiseVolume, exec, wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+
 bindel = ,XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
-bindl = ,XF86AudioMute, exec, ~/.config/hypr/mute-toggle.sh sink
-bindl = ,XF86AudioMicMute, exec, ~/.config/hypr/mute-toggle.sh source
+bindel = ,XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+bindel = ,XF86AudioMicMute, exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
 bindel = ,XF86MonBrightnessUp, exec, brightnessctl -e4 -n2 set 5%+
 bindel = ,XF86MonBrightnessDown, exec, brightnessctl -e4 -n2 set 5%-
 
@@ -356,3 +352,4 @@ windowrule {
     move = 20 monitor_h-120
     float = yes
 }
+	
