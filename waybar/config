@@ -1,0 +1,104 @@
+{
+    "layer": "top",
+    "position": "top",
+    "height": 22,
+    "spacing": 9,
+
+    "modules-left": ["hyprland/workspaces", "hyprland/window"],
+    "modules-center": ["clock"],
+    "modules-right": ["pulseaudio", "pulseaudio#mic", "backlight", "bluetooth", "network", "memory", "battery", "custom/power-profile", "custom/idle-inhibit", "cpu"],
+
+    "hyprland/workspaces": {
+        "format": "{id}",
+        "on-click": "activate",
+        "sort-by-number": true
+    },
+
+    "hyprland/window": {
+        "format": "{title}",
+        "max-length": 60,
+        "separate-outputs": true,
+        "tooltip": false
+    },
+
+    "clock": {
+        "format": "{:%a %d %b  %H:%M}",
+        "tooltip": false
+    },
+
+    "cpu": {
+        "format": "cpu {usage}%",
+        "interval": 5,
+        "tooltip": false
+    },
+
+    "bluetooth": {
+        "format": "bt",
+        "format-connected": "bt {device_alias}",
+        "format-disabled": "bt off",
+        "on-click": "~/.config/waybar/bluetooth-menu.sh",
+        "tooltip": false
+    },
+
+    "network": {
+        "format-wifi": "{essid}",
+        "format-ethernet": "eth",
+        "format-disconnected": "off",
+        "on-click": "~/.config/waybar/wifi-menu.sh",
+        "tooltip": false
+    },
+
+    "pulseaudio": {
+        "format": "vol {volume}%",
+        "format-muted": "mute",
+        "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+        "tooltip": false
+    },
+
+    "pulseaudio#mic": {
+        "format": "mic {volume}%",
+        "format-source-muted": "mic mute",
+        "format-source": "mic {volume}%",
+        "format": "{format_source}",
+        "on-click": "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle",
+        "tooltip": false
+    },
+
+    "backlight": {
+        "format": "bl {percent}%",
+        "on-scroll-up": "brightnessctl -e4 -n2 set 5%+",
+        "on-scroll-down": "brightnessctl -e4 -n2 set 5%-",
+        "tooltip": false
+    },
+
+    "battery": {
+        "format": "bat {capacity}%",
+        "format-charging": "chg {capacity}%",
+        "format-full": "full",
+        "states": {
+            "warning": 30,
+            "critical": 15
+        },
+        "tooltip": false
+    },
+
+    "memory": {
+        "format": "mem {}%",
+        "interval": 5,
+        "tooltip": false
+    },
+
+    "custom/idle-inhibit": {
+        "exec": "~/.config/waybar/idle-inhibit.sh",
+        "on-click": "~/.config/waybar/idle-inhibit.sh toggle",
+        "interval": 2,
+        "tooltip": false
+    },
+
+    "custom/power-profile": {
+        "exec": "powerprofilesctl get | sed 's/power-saver/save/;s/balanced/bal/;s/performance/perf/'",
+        "interval": 5,
+        "on-click": "~/.config/waybar/power-profile.sh",
+        "tooltip": false
+    }
+}
