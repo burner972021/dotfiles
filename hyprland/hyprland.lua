@@ -1,0 +1,251 @@
+local c = require("colors")
+
+--------------------
+---- MONITORS   ----
+--------------------
+
+hl.monitor({
+    output   = "eDP-1",
+    mode     = "1920x1080@60",
+    position = "0x0",
+    scale    = 1.0,
+})
+
+
+---------------------
+---- MY PROGRAMS ----
+---------------------
+
+local terminal    = "kitty"
+local fileManager = "dolphin"
+local menu        = "hyprlauncher"
+
+
+-------------------
+---- AUTOSTART ----
+-------------------
+
+hl.on("hyprland.start", function()
+    hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")
+    hl.exec_cmd("kbuildsycoca6")
+    hl.exec_cmd("waybar")
+    hl.exec_cmd("bash -c 'hyprpaper & sleep 2 && hyprctl hyprpaper wallpaper \"eDP-1,/usr/share/wallpapers/wallpaper/photo_11_2026-05-01_22-51-32.jpg\"'")
+    hl.exec_cmd("mako")
+    hl.exec_cmd("~/.config/waybar/battery-notify.sh")
+    hl.exec_cmd("/usr/lib/xdg-desktop-portal-kde")
+    hl.exec_cmd("bash -c 'sleep 2 && swayidle -w timeout 150 \"brightnessctl -s set 10\" resume \"brightnessctl -r\" timeout 300 \"pidof hyprlock || hyprlock\" timeout 360 \"hyprctl dispatch dpms off\" resume \"hyprctl dispatch dpms on\" before-sleep \"pidof hyprlock || hyprlock\" after-resume \"hyprctl dispatch dpms on\"'")
+    hl.exec_cmd("sudo ~/windows.sh")
+    hl.exec_cmd("copyq")
+end)
+
+
+-------------------------------
+---- ENVIRONMENT VARIABLES ----
+-------------------------------
+
+hl.env("XCURSOR_SIZE",        "18")
+hl.env("XCURSOR_THEME",       "Adwaita")
+hl.env("HYPRCURSOR_SIZE",     "18")
+hl.env("HYPRCURSOR_THEME",    "Adwaita")
+hl.env("QT_QPA_PLATFORMTHEME","kde")
+hl.env("XDG_DATA_DIRS",       "/usr/local/share:/usr/share")
+
+
+-----------------------
+---- LOOK AND FEEL ----
+-----------------------
+
+hl.config({
+    general = {
+        gaps_in  = 0,
+        gaps_out = 0,
+
+        border_size = 1,
+
+        col = {
+            active_border   = c.yellow,
+            inactive_border = c.bg1,
+        },
+
+        resize_on_border = true,
+        allow_tearing    = false,
+        layout           = "dwindle",
+    },
+
+    decoration = {
+        rounding = 0,
+
+        active_opacity   = 1.0,
+        inactive_opacity = 0.95,
+
+        shadow = { enabled = false },
+        blur   = { enabled = true },
+    },
+
+    animations = { enabled = true },
+})
+
+hl.curve("snap", { type = "bezier", points = { {0.05, 0.7}, {0.1, 1.0} } })
+
+hl.animation({ leaf = "windows",    enabled = true, speed = 3, bezier = "snap" })
+hl.animation({ leaf = "border",     enabled = true, speed = 5, bezier = "snap" })
+hl.animation({ leaf = "fade",       enabled = true, speed = 3, bezier = "snap" })
+hl.animation({ leaf = "workspaces", enabled = true, speed = 3, bezier = "snap" })
+
+hl.config({
+    dwindle = { preserve_split = true },
+    master  = { new_status = "master" },
+    misc    = {
+        force_default_wallpaper = 0,
+        disable_hyprland_logo   = true,
+    },
+})
+
+
+---------------
+---- INPUT ----
+---------------
+
+hl.config({
+    input = {
+        kb_layout  = "us",
+        kb_variant = "",
+        kb_model   = "",
+        kb_options = "",
+        kb_rules   = "",
+
+        follow_mouse = 1,
+        sensitivity  = 0.4,
+
+        touchpad = { natural_scroll = true },
+    },
+})
+
+hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
+
+hl.config({
+    gestures = {
+        workspace_swipe_distance           = 200,
+        workspace_swipe_cancel_ratio       = 0.2,
+        workspace_swipe_min_speed_to_force = 25,
+    },
+})
+
+hl.device({ name = "epic-mouse-v1", sensitivity = -0.5 })
+
+
+---------------------
+---- KEYBINDINGS ----
+---------------------
+
+local mainMod = "SUPER"
+
+hl.bind(mainMod .. " + Q",         hl.dsp.exec_cmd(terminal))
+hl.bind(mainMod .. " + C",         hl.dsp.window.close())
+hl.bind(mainMod .. " + M",         hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch exit"))
+hl.bind(mainMod .. " + L",         hl.dsp.exec_cmd("hyprlock"))
+hl.bind("XF86PowerOff",            hl.dsp.exec_cmd("hyprlock"))
+hl.bind(mainMod .. " + E",         hl.dsp.exec_cmd(fileManager))
+hl.bind(mainMod .. " + V",         hl.dsp.exec_cmd("copyq toggle"))
+hl.bind(mainMod .. " + SHIFT + V", hl.dsp.window.float({ action = "toggle" }))
+hl.bind(mainMod .. " + F",         hl.dsp.window.fullscreen())
+hl.bind(mainMod .. " + R",         hl.dsp.exec_cmd(menu))
+hl.bind(mainMod .. " + P",         hl.dsp.window.pseudo())
+hl.bind(mainMod .. " + escape",    hl.dsp.exec_cmd("kitty btop"))
+hl.bind(mainMod .. " + J",         hl.dsp.layout("togglesplit"))
+
+-- Focus
+hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "left" }))
+hl.bind(mainMod .. " + right", hl.dsp.focus({ direction = "right" }))
+hl.bind(mainMod .. " + up",    hl.dsp.focus({ direction = "up" }))
+hl.bind(mainMod .. " + down",  hl.dsp.focus({ direction = "down" }))
+
+-- Resize
+hl.bind(mainMod .. " + ALT + left",  hl.dsp.window.resize({ x = -30, y = 0 }),  { repeating = true })
+hl.bind(mainMod .. " + ALT + right", hl.dsp.window.resize({ x = 30,  y = 0 }),  { repeating = true })
+hl.bind(mainMod .. " + ALT + up",    hl.dsp.window.resize({ x = 0,   y = -30 }), { repeating = true })
+hl.bind(mainMod .. " + ALT + down",  hl.dsp.window.resize({ x = 0,   y = 30 }),  { repeating = true })
+
+-- Show desktop (nearest empty workspace)
+hl.bind(mainMod .. " + D", hl.dsp.focus({ workspace = "empty" }))
+
+-- Workspaces
+for i = 1, 10 do
+    local key = i % 10
+    hl.bind(mainMod .. " + " .. key,         hl.dsp.focus({ workspace = i }))
+    hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i }))
+end
+
+-- Scratchpad
+hl.bind(mainMod .. " + S",         hl.dsp.workspace.toggle_special("magic"))
+hl.bind(mainMod .. " + SHIFT + Z", hl.dsp.window.move({ workspace = "special:magic" }))
+
+-- Screenshots (bash -c needed for shell features: pipes, $(), &&)
+hl.bind(mainMod .. " + SHIFT + S",       hl.dsp.exec_cmd('bash -c "grim -g \\"$(slurp)\\" - | wl-copy"'))
+hl.bind(mainMod .. " + SHIFT + ALT + S", hl.dsp.exec_cmd('bash -c "grim -g \\"$(slurp)\\" ~/Pictures/$(date +%Y%m%d_%H%M%S).png"'))
+hl.bind("Print",                          hl.dsp.exec_cmd('bash -c "mkdir -p ~/Pictures/Screenshots && grim -g \\"$(slurp)\\" ~/Pictures/Screenshots/$(date +%Y-%m-%d_%H-%M-%S).png"'))
+hl.bind(mainMod .. " + Print",           hl.dsp.exec_cmd('bash -c "mkdir -p ~/Pictures/Screenshots && grim ~/Pictures/Screenshots/$(date +%Y-%m-%d_%H-%M-%S).png"'))
+
+-- Workspaces via scroll
+hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
+hl.bind(mainMod .. " + mouse_up",   hl.dsp.focus({ workspace = "e-1" }))
+
+-- Mouse move/resize
+hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true })
+hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
+
+-- Volume
+hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true })
+hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"),      { locked = true, repeating = true })
+hl.bind("XF86AudioMute",        hl.dsp.exec_cmd("~/.config/hypr/mute-toggle.sh sink"),             { locked = true })
+hl.bind("XF86AudioMicMute",     hl.dsp.exec_cmd("~/.config/hypr/mute-toggle.sh source"),           { locked = true })
+
+-- Brightness
+hl.bind("XF86MonBrightnessUp",   hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+"), { locked = true, repeating = true })
+hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"), { locked = true, repeating = true })
+
+-- Media
+hl.bind("XF86AudioNext",  hl.dsp.exec_cmd("playerctl next"),       { locked = true })
+hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
+hl.bind("XF86AudioPlay",  hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
+hl.bind("XF86AudioPrev",  hl.dsp.exec_cmd("playerctl previous"),   { locked = true })
+
+
+--------------------------------
+---- WINDOWS AND WORKSPACES ----
+--------------------------------
+
+hl.window_rule({
+    name  = "suppress-maximize-events",
+    match = { class = ".*" },
+    suppress_event = "maximize",
+})
+
+hl.window_rule({
+    name  = "fix-xwayland-drags",
+    match = {
+        class      = "^$",
+        title      = "^$",
+        xwayland   = true,
+        float      = true,
+        fullscreen = false,
+        pin        = false,
+    },
+    no_focus = true,
+})
+
+hl.window_rule({
+    name  = "copyq-float",
+    match = { class = "^(com.github.hluk.copyq)$" },
+    float  = true,
+    center = true,
+    size   = "700 500",
+    pin    = true,
+})
+
+hl.window_rule({
+    name  = "move-hyprland-run",
+    match = { class = "hyprland-run" },
+    move  = "20 monitor_h-120",
+    float = true,
+})
